@@ -9,8 +9,8 @@ public interface IVentaService {
      List<Venta> listarVenta();
      List<Venta> listarEstadoVenta(int estado);
     Venta guardar(Venta venta);
-     Optional<Venta> buscarPorCode(Long code);
-     Venta ActualizarV(Long code, Venta venta);
-     void eliminarV(Long code);
-     boolean existCodeV(Long code);
+     Optional<Venta> buscarPorCode(int code);
+     Venta ActualizarV(int code, Venta venta);
+     void eliminarV(int code);
+     boolean existCodeV(int code);
 }
