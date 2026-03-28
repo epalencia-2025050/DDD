@@ -1,5 +1,6 @@
 package com.eduardoemilio.KinalApp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -11,21 +12,29 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_producto")
     private Long codigoProducto;
-    @Column
+    @Column(nullable = false)
     private String nombreProducto;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2,nullable = false)
     private BigDecimal precio;
-    @Column
+    @Column(nullable = false)
     private int stock;
-    @Column
+    @Column(nullable = false)
     private int estado;
 
-    public Producto(Long codigoProducto, String nombreProducto, BigDecimal precio, int stock, int estado) {
+    public Producto() {
+    }
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<DetalleVenta> detalleVentas;
+
+    public Producto(Long codigoProducto, String nombreProducto, BigDecimal precio, int stock, int estado, List<DetalleVenta> detalleVentas) {
         this.codigoProducto = codigoProducto;
         this.nombreProducto = nombreProducto;
         this.precio = precio;
         this.stock = stock;
         this.estado = estado;
+        this.detalleVentas = detalleVentas;
     }
 
     public Long getCodigoProducto() {
@@ -66,5 +75,13 @@ public class Producto {
 
     public void setEstado(int estado) {
         this.estado = estado;
+    }
+
+    public List<DetalleVenta> getDetalleVentas() {
+        return detalleVentas;
+    }
+
+    public void setDetalleVentas(List<DetalleVenta> detalleVentas) {
+        this.detalleVentas = detalleVentas;
     }
 }
