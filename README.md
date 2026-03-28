@@ -83,3 +83,63 @@ DetalleVenta:
 3. "/{code}": Esto busca los detalles de venta mediante él id.
 4. "/{code}": Esto elimina los detalles de venta mediante él id.
 5. "/{code}": Esto actualiza los detalles de venta mediante él id.
+
+## Postman del Proyecto
+
+-Post de Clientes
+{
+"DPICliente": "1234567890123",
+"nombreCliente": "Juan",
+"apellidoCliente": "Pérez",
+"direccion": "Calle Falsa 123",
+"estado": 1
+}
+
+-Post de Usuario
+{
+"username": "vendedor1",
+"password": "123456",
+"email": "vendedor@tienda.com",
+"rol": "VENDEDOR",
+"estado": 1
+}
+
+-Post de Producto
+{
+"nombreProducto": "Laptop Gamer",
+"precio": 1500.00,
+"stock": 10,
+"estado": 1
+}
+
+-Post de Venta
+{
+"fechaVenta": "2025-03-27",
+"total": 12.00,
+"estado": 1,
+"cliente": {
+"DPICliente": "1234567890123",
+"estado": 1
+},
+"usuario": {
+"codigoUsuario": 1,
+"estado": 1
+}
+}
+
+-Post de DetalleVenta
+{
+"cantidad": 2,
+"precioUnitario": 1850.00,
+"subtotal": 3700.00,
+"producto": {
+"codigoProducto": 1,
+"estado": 1,
+"stock": 15
+},
+"venta": {
+"codigoVenta": 1,
+"estado": 1
+}
+}
+
