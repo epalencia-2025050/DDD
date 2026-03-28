@@ -1,9 +1,9 @@
 package com.eduardoemilio.KinalApp.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "clientes")
@@ -11,24 +11,29 @@ public class Cliente {
     @Id
     @Column(name = "dpi_cliente")
     private String DPICliente;
-    @Column
+    @Column(nullable = false)
     private String nombreCliente;
-    @Column
+    @Column(nullable = false)
     private String apellidoCliente;
-    @Column
+    @Column(nullable = false)
     private String direccion;
-    @Column
+    @Column(nullable = false)
     private int estado;
 
     public Cliente() {
     }
 
-    public Cliente(String DPICliente, String nombreCliente, String apellidoCliente, String direccion, int estado) {
+    @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
+    private List<Venta> ventas;
+
+    public Cliente(String DPICliente, String nombreCliente, String apellidoCliente, String direccion, int estado, List<Venta> ventas) {
         this.DPICliente = DPICliente;
         this.nombreCliente = nombreCliente;
         this.apellidoCliente = apellidoCliente;
         this.direccion = direccion;
         this.estado = estado;
+        this.ventas = ventas;
     }
 
     public String getDPICliente() {
@@ -71,4 +76,11 @@ public class Cliente {
         this.estado = estado;
     }
 
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
+    }
 }
