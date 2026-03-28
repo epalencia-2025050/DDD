@@ -1,6 +1,8 @@
 package com.eduardoemilio.KinalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,31 +14,32 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
     private Long codigoUsuario;
-    @Column
+    @Column(nullable = false)
     private String username;
-    @Column
+    @Column(nullable = false)
     private String password;
-    @Column
+    @Column(nullable = false)
     private String email;
-    @Column
+    @Column(nullable = false)
     private String rol;
-    @Column
+    @Column(nullable = false)
     private int estado;
 
+    @OneToMany(mappedBy = "usuario")
     @JsonIgnore
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Venta> ventas;
 
     public Usuario() {
     }
 
-    public Usuario(Long codigoUsuario, String username, String password, String email, String rol, int estado) {
+    public Usuario(Long codigoUsuario, String username, String password, String email, String rol, int estado, List<Venta> ventas) {
         this.codigoUsuario = codigoUsuario;
         this.username = username;
         this.password = password;
         this.email = email;
         this.rol = rol;
         this.estado = estado;
+        this.ventas = ventas;
     }
 
     public Long getCodigoUsuario() {
@@ -85,5 +88,13 @@ public class Usuario {
 
     public void setEstado(int estado) {
         this.estado = estado;
+    }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
     }
 }
