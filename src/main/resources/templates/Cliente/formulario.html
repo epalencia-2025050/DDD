@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<head><title th:text="${titulo}">Cliente</title></head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header"><h3 th:text="${titulo}"></h3></div>
+        <div class="card-body">
+            <form th:action="${cliente.DPICliente != null} ? @{/clientes/actualizar/{dpi}(dpi=${cliente.DPICliente})} : @{/clientes/guardar}"
+                  th:object="${cliente}" method="post">
+                <div class="mb-3"><label>DPI</label><input type="text" th:field="*{DPICliente}" class="form-control" required></div>
+                <div class="mb-3"><label>Nombre</label><input type="text" th:field="*{nombreCliente}" class="form-control" required></div>
+                <div class="mb-3"><label>Apellido</label><input type="text" th:field="*{apellidoCliente}" class="form-control" required></div>
+                <div class="mb-3"><label>Dirección</label><input type="text" th:field="*{direccion}" class="form-control" required></div>
+                <div class="mb-3"><label>Estado</label>
+                    <select th:field="*{estado}" class="form-select">
+                        <option th:value="1">Activo</option>
+                        <option th:value="0">Inactivo</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a th:href="@{/clientes}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
