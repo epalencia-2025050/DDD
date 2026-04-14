@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<head><title th:text="${titulo}">Usuario</title></head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header"><h3 th:text="${titulo}"></h3></div>
+        <div class="card-body">
+            <form th:action="${usuario.codigoUsuario != null} ? @{/usuarios/actualizar/{code}(code=${usuario.codigoUsuario})} : @{/usuarios/guardar}"
+                  th:object="${usuario}" method="post">
+                <div class="mb-3"><label>Username</label><input type="text" th:field="*{username}" class="form-control" required></div>
+                <div class="mb-3"><label>Email</label><input type="email" th:field="*{email}" class="form-control" required></div>
+                <div class="mb-3"><label>Password</label><input type="password" th:field="*{password}" class="form-control" required></div>
+                <div class="mb-3"><label>Rol</label>
+                    <select th:field="*{rol}" class="form-select">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="USER">USER</option>
+                    </select>
+                </div>
+                <div class="mb-3"><label>Estado</label>
+                    <select th:field="*{estado}" class="form-select">
+                        <option th:value="1">Activo</option>
+                        <option th:value="0">Inactivo</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a th:href="@{/usuarios}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
