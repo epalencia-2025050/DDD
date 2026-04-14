@@ -1,84 +1,135 @@
 package com.eduardoemilio.KinalApp.controller;
 
-import com.eduardoemilio.KinalApp.entity.Usuario;
 import com.eduardoemilio.KinalApp.entity.Venta;
 import com.eduardoemilio.KinalApp.service.IVentaService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.eduardoemilio.KinalApp.service.IClienteService;
+import com.eduardoemilio.KinalApp.service.IUsuarioService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/ventas")
 public class VentaController {
 
     private final IVentaService ventaService;
+    private final IClienteService clienteService;
+    private final IUsuarioService usuarioService;
 
-    public VentaController(IVentaService ventaService) {
+    public VentaController(IVentaService ventaService, IClienteService clienteService, IUsuarioService usuarioService) {
         this.ventaService = ventaService;
+        this.clienteService = clienteService;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Venta>> listarVenta(){
+    public String listarVenta(Model model) {
         List<Venta> ventas = ventaService.listarVenta();
-        return ResponseEntity.ok(ventas);
+        model.addAttribute("ventas", ventas);
+        model.addAttribute("titulo", "Listado de Ventas");
+        return "venta/lista";
+    }
+
+    @GetMapping("/nuevo")
+    public String nuevo(Model model) {
+        Venta venta = new Venta();
+        venta.setFechaVenta(LocalDate.now());
+        venta.setEstado(1);
+        model.addAttribute("venta", venta);
+        model.addAttribute("titulo", "Nueva Venta");
+        model.addAttribute("clientes", clienteService.listarTodos());
+        model.addAttribute("usuarios", usuarioService.listarUsuario());
+        return "venta/formulario";
+    }
+
+    @GetMapping("/editar/{code}")
+    public String editar(@PathVariable int code, Model model, RedirectAttributes flash) {
+        return ventaService.buscarPorCode(code)
+                .map(venta -> {
+                    model.addAttribute("venta", venta);
+                    model.addAttribute("titulo", "Editar Venta");
+                    model.addAttribute("clientes", clienteService.listarTodos());
+                    model.addAttribute("usuarios", usuarioService.listarUsuario());
+                    return "venta/formulario";
+                })
+                .orElseGet(() -> {
+                    flash.addFlashAttribute("error", "Venta no encontrada");
+                    return "redirect:/ventas";
+                });
+    }
+
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Venta venta,
+                          @RequestParam(required = false) String clienteDpi,
+                          @RequestParam(required = false) Long usuarioCode,
+                          RedirectAttributes flash) {
+        try {
+            if (clienteDpi != null && !clienteDpi.isEmpty()) {
+                clienteService.bucarPorDPI(clienteDpi).ifPresent(venta::setCliente);
+            }
+            if (usuarioCode != null) {
+                usuarioService.buscarPorcode(usuarioCode).ifPresent(venta::setUsuario);
+            }
+            ventaService.guardar(venta);
+            flash.addFlashAttribute("mensaje", "Venta guardada exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("mensaje", e.getMessage());
+            flash.addFlashAttribute("tipoMensaje", "danger");
+        }
+        return "redirect:/ventas";
+    }
+
+    @PostMapping("/actualizar/{code}")
+    public String actualizar(@PathVariable int code, @ModelAttribute Venta venta, RedirectAttributes flash) {
+        try {
+            ventaService.ActualizarV(code, venta);
+            flash.addFlashAttribute("mensaje", "Venta actualizada exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("mensaje", e.getMessage());
+            flash.addFlashAttribute("tipoMensaje", "danger");
+        }
+        return "redirect:/ventas";
+    }
+
+    @GetMapping("/eliminar/{code}")
+    public String eliminar(@PathVariable int code, RedirectAttributes flash) {
+        try {
+            ventaService.eliminarV(code);
+            flash.addFlashAttribute("mensaje", "Venta eliminada exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
+        } catch (RuntimeException e) {
+            flash.addFlashAttribute("mensaje", "Error al eliminar");
+            flash.addFlashAttribute("tipoMensaje", "danger");
+        }
+        return "redirect:/ventas";
+    }
+
+    @GetMapping("/ver/{code}")
+    public String ver(@PathVariable int code, Model model, RedirectAttributes flash) {
+        return ventaService.buscarPorCode(code)
+                .map(venta -> {
+                    model.addAttribute("venta", venta);
+                    model.addAttribute("titulo", "Detalle de Venta #" + code);
+                    return "venta/detalle";
+                })
+                .orElseGet(() -> {
+                    flash.addFlashAttribute("error", "Venta no encontrada");
+                    return "redirect:/ventas";
+                });
     }
 
     @GetMapping("/activos/{estado}")
-    public ResponseEntity<List<Venta>> VentaEstado(@PathVariable int estado){
+    public String ventaEstado(@PathVariable int estado, Model model) {
         List<Venta> ventas = ventaService.listarEstadoVenta(estado);
-        return ResponseEntity.ok(ventaService.listarEstadoVenta(estado));
+        model.addAttribute("ventas", ventas);
+        model.addAttribute("titulo", estado == 1 ? "Ventas Activas" : "Ventas Inactivas");
+        model.addAttribute("filtroEstado", estado);
+        return "venta/lista";
     }
-
-    @GetMapping("/{code}")
-    public ResponseEntity<Venta> buscarPorCode(@PathVariable int code){
-        return ventaService.buscarPorCode(code)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody Venta venta){
-        System.out.println("Venta recibida: " + venta);
-        System.out.println("Cliente: " + venta.getCliente());
-        System.out.println("Usuario: " + venta.getUsuario());
-        try{
-            Venta nuevaVenta = ventaService.guardar(venta);
-            return new ResponseEntity<>(nuevaVenta, HttpStatus.CREATED);
-        }catch(IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-
-
-    @DeleteMapping("/{code}")
-       public ResponseEntity<Void> eliminar(@PathVariable int code){
-        try{
-            if(!ventaService.existCodeV(code)){
-                return ResponseEntity.notFound().build();
-            }
-            ventaService.eliminarV(code);
-            return ResponseEntity.noContent().build();
-        }catch(RuntimeException e){
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @PutMapping("/{code}")
-    public ResponseEntity<?> Actualizar(@PathVariable int code, @RequestBody Venta venta){
-        try{
-            if(!ventaService.existCodeV(code)){
-                return ResponseEntity.notFound().build();
-            }
-            Venta ventaAc = ventaService.ActualizarV(code, venta);
-            return ResponseEntity.ok(ventaAc);
-        }catch(IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }catch(RuntimeException e){
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }
