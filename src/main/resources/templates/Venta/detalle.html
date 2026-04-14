@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<head><title th:text="${titulo}">Detalle de Venta</title></head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header"><h3 th:text="${titulo}"></h3></div>
+        <div class="card-body">
+            <p><strong>Fecha:</strong> <span th:text="${venta.fechaVenta}"></span></p>
+            <p><strong>Total:</strong> Q <span th:text="${venta.total}"></span></p>
+            <p><strong>Cliente:</strong> <span th:text="${venta.cliente.nombreCliente + ' ' + venta.cliente.apellidoCliente}"></span></p>
+            <p><strong>Vendedor:</strong> <span th:text="${venta.usuario.username}"></span></p>
+            <p><strong>Estado:</strong>
+                <span th:if="${venta.estado == 1}" class="badge bg-success">Activa</span>
+                <span th:if="${venta.estado == 0}" class="badge bg-secondary">Inactiva</span>
+            </p>
+            <hr>
+            <h4>Detalles de la venta</h4>
+            <table class="table table-sm">
+                <thead>
+                <tr><th>Producto</th><th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${venta.detalles}">
+                    <td th:text="${d.producto.nombreProducto}"></td>
+                    <td th:text="${d.cantidad}"></td>
+                    <td th:text="${d.precioUnitario}"></td>
+                    <td th:text="${d.subtotal}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(venta.detalles)}">
+                    <td colspan="4" class="text-center">No hay detalles</td>
+                </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/ventas}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
