@@ -19,5 +19,5 @@ public interface IUsuarioService {
     Optional<Usuario> buscarPorcode(Long code);
 
     List<Usuario> UsuarioEstado(int estado);
-
+    Optional<Usuario> buscarPorEmail(String email);
 }
