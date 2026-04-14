@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<head><title>Menú Principal</title></head>
+<body>
+<div th:fragment="content">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Bienvenido, <span th:text="${session.usuarioLogueado.username}"></span>!</h1>
+        <p class="lead">Sistema de gestión de ventas - KinalApp</p>
+        <hr class="my-4">
+        <p>Seleccione una opción del menú para comenzar.</p>
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                        <h5 class="card-title mt-2">Usuarios</h5>
+                        <a href="/usuarios" class="btn btn-primary">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-user-friends fa-3x text-success"></i>
+                        <h5 class="card-title mt-2">Clientes</h5>
+                        <a href="/clientes" class="btn btn-success">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-boxes fa-3x text-warning"></i>
+                        <h5 class="card-title mt-2">Productos</h5>
+                        <a href="/productos" class="btn btn-warning">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shopping-cart fa-3x text-info"></i>
+                        <h5 class="card-title mt-2">Ventas</h5>
+                        <a href="/ventas" class="btn btn-info">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-list-alt fa-3x text-secondary"></i>
+                        <h5 class="card-title mt-2">Detalles</h5>
+                        <a href="/detallesVentas" class="btn btn-secondary">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
