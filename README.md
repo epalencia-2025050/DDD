@@ -86,7 +86,7 @@ DetalleVenta:
 
 ## Postman del Proyecto
 
--Post de Clientes
+- Post de Clientes
 {
 "DPICliente": "1234567890123",
 "nombreCliente": "Juan",
@@ -95,7 +95,7 @@ DetalleVenta:
 "estado": 1
 }
 
--Post de Usuario
+- Post de Usuario
 {
 "username": "vendedor1",
 "password": "123456",
@@ -104,7 +104,7 @@ DetalleVenta:
 "estado": 1
 }
 
--Post de Producto
+- Post de Producto
 {
 "nombreProducto": "Laptop Gamer",
 "precio": 1500.00,
@@ -112,7 +112,7 @@ DetalleVenta:
 "estado": 1
 }
 
--Post de Venta
+- Post de Venta
 {
 "fechaVenta": "2025-03-27",
 "total": 12.00,
@@ -127,7 +127,7 @@ DetalleVenta:
 }
 }
 
--Post de DetalleVenta
+- Post de DetalleVenta
 {
 "cantidad": 2,
 "precioUnitario": 1850.00,
@@ -142,4 +142,165 @@ DetalleVenta:
 "estado": 1
 }
 }
+
+## implementacion de tymelaft 
+Se creó una estructura de carpetas organizada dentro de src/main/resources/templates/. 
+Todas las vistas heredan de un layout base que contiene la barra de navegación
+
+
+### vista de Autenticación/login:
+
+- login.html - Formulario de inicio de sesión con campos de email y contraseña, más un enlace para registrar nueva cuenta.
+
+- registro.html - Formulario para crear un nuevo usuario con username, email y password.
+
+- menu.html - Página principal con tarjetas de acceso a cada módulo del sistema.
+
+### vista de Usuarios:
+
+- usuario/lista.html - Listado de usuarios con filtros por estado (activos/inactivos/todos).
+
+- usuario/formulario.html - Formulario reutilizable para crear y editar usuarios.
+
+### vista de Clientes:
+
+- cliente/lista.html - Listado de clientes con filtros por estado. Muestra DPI, nombre, apellido, dirección y estado.
+
+- cliente/formulario.html - Formulario para crear o editar clientes, con DPI como clave primaria.
+
+### vista de Productos:
+
+- producto/lista.html - Listado de productos con código, nombre, precio, stock y estado.
+
+- producto/formulario.html - Formulario para gestionar productos.
+
+### vista de Ventas:
+
+- venta/lista.html - Listado de ventas (solo visualización, sin botones de editar/eliminar por cumplimiento fiscal).
+
+- venta/formulario.html - Formulario exclusivo para crear nuevas ventas, con selección de cliente y usuario.
+
+- venta/detalle.html - Vista detallada de una venta, mostrando todos los productos asociados y sus cantidades.
+
+### vista de Detalles de Venta:
+
+- detalle/lista.html - Listado de detalles de venta en modo solo lectura (sin acciones de modificación).
+
+- detalle/formulario.html - Formulario para agregar nuevos detalles a una venta existente.
+
+## Recursos estáticos y estilos
+- Se agregó la carpeta src/main/resources/static/images/ para alojar el logo de la empresa (KS Solution's). También se incorporó una paleta de colores personalizada en el layout base, con los siguientes colores corporativos:
+
+- Azul marino profundo (#1B365D) para la barra de navegación y encabezados.
+
+- Azul real (#2A5DA0) para botones primarios y degradados.
+
+- Naranja vibrante (#FF8C00) para detalles de énfasis y hover.
+
+- Gris carbón (#333F48) para textos secundarios.
+
+- Blanco nieve (#FFFFFF) para fondos y espacios negativos.
+
+## Cambios de controller para poder implementar tymelaft
+
+### LoginController (nuevo)
+Se creó este controlador desde cero para manejar el inicia sesion y el registro.
+
+- Creación del método mostrarLogin() que retorna la vista login.
+
+- Creación del método procesarLogin() que recibe email y password, busca el usuario en la base de datos y guarda la sesión.
+
+- Creación del método mostrarRegistro() que retorna la vista registro.
+
+- Creación del método procesarRegistro() que guarda un nuevo usuario con rol "USER" y estado activo.
+
+- Creación del método menu() que muestra el menú principal verificando sesión activa.
+
+- Creación del método logout() que invalida la sesión y redirige al login.
+
+### UsuarioController
+- Modificación del método listar() para agregar usuarios al modelo y retornar "usuario/lista".
+
+- Modificación del método nuevo() para agregar un nuevo objeto Usuario al modelo y retornar "usuario/formulario".
+
+- Modificación del método guardar() para usar RedirectAttributes con mensajes flash.
+
+- Modificación del método editar() para usar Optional con map() y orElseGet().
+
+- Modificación del método actualizar() para recibir @PathVariable y @ModelAttribute.
+
+- Modificación del método eliminar() para usar RedirectAttributes y redirigir.
+
+- Modificación del método usuarioEstado() para filtrar por estado y retornar la misma vista con datos filtrados.
+
+### ClienteController
+- Modificación del método listar() para retornar "cliente/lista".
+
+- Modificación del método nuevo() para retornar "cliente/formulario".
+
+- Modificación del método guardar() para usar mensajes.
+
+- Modificación del método editar() para buscar por DPI (String).
+
+- Modificación del método actualizar() para recibir DPI como @PathVariable.
+
+- Modificación del método eliminar() para eliminar por DPI.
+
+- Modificación del método clienteEstado() para filtrar por estado.
+
+### ProductoController
+- Modificación de listarProducto() para retornar "producto/lista".
+
+- Modificación de nuevo() para retornar "producto/formulario".
+
+- Modificación de guardar(), editar(), actualizar(), eliminar() y productoEstado() siguiendo el mismo patrón.
+
+### VentaController
+- Modificación de listarVenta() para retornar "venta/lista".
+
+- Modificación de nuevo() para:
+
+- Crear una venta con fecha actual y estado activo por defecto.
+
+- Agregar al modelo las listas de clientes y usuarios para los selectores del formulario.
+
+- Retornar "venta/formulario".
+
+- Modificación de guardar() para:
+
+- Recibir clienteDpi y usuarioCode como parámetros separados (no vienen dentro del objeto Venta).
+
+- Buscar y asignar el cliente y usuario antes de guardar.
+
+- Calcular subtotales si es necesario.
+
+- Creación del método ver() para mostrar el detalle completo de una venta.
+
+- Eliminación de métodos editar(), actualizar() y eliminar() por razones fiscales (no se permiten modificaciones en ventas registradas).
+
+### DetalleVentaController
+- Modificación de listar() para retornar "detalle/lista".
+
+- Modificación de nuevo() para:
+
+- Crear un detalle con valores por defecto.
+
+- Agregar al modelo las listas de ventas y productos.
+
+- Retornar "detalle/formulario".
+
+- Modificación de guardar() para:
+
+- Recibir ventaId y productoId como parámetros separados.
+
+- Buscar y asignar la venta y el producto.
+
+- Calcular automáticamente el subtotal (cantidad × precioUnitario).
+
+- Creación del método listarPorVenta() para filtrar detalles por ID de venta.
+
+- Eliminación de métodos editar(), actualizar() y eliminar() por razones fiscales.
+
+## Imagenes de funcionamiento de la aplicacion 
+
 
