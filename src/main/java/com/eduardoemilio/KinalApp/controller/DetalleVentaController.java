@@ -2,70 +2,135 @@ package com.eduardoemilio.KinalApp.controller;
 
 import com.eduardoemilio.KinalApp.entity.DetalleVenta;
 import com.eduardoemilio.KinalApp.service.IDetalleVentaService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.eduardoemilio.KinalApp.service.IVentaService;
+import com.eduardoemilio.KinalApp.service.IProductoService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/detallesVentas")
 public class DetalleVentaController {
 
     private final IDetalleVentaService detalleVentaService;
+    private final IVentaService ventaService;
+    private final IProductoService productoService;
 
-    public DetalleVentaController(IDetalleVentaService detalleVentaService) {
+    public DetalleVentaController(IDetalleVentaService detalleVentaService,
+                                  IVentaService ventaService,
+                                  IProductoService productoService) {
         this.detalleVentaService = detalleVentaService;
+        this.ventaService = ventaService;
+        this.productoService = productoService;
     }
 
     @GetMapping
-    public ResponseEntity<List<DetalleVenta>> listar() {
+    public String listar(Model model) {
         List<DetalleVenta> detallesventas = detalleVentaService.listarDVenta();
-        return ResponseEntity.ok(detallesventas);
+        model.addAttribute("detalles", detallesventas);
+        model.addAttribute("titulo", "Listado de Detalles de Venta");
+        return "detalle/lista";
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity<DetalleVenta> buscarPorCODIGO(@PathVariable Long code) {
+    @GetMapping("/nuevo")
+    public String nuevo(Model model) {
+        DetalleVenta detalle = new DetalleVenta();
+        detalle.setCantidad(1);
+        detalle.setPrecioUnitario(BigDecimal.ZERO);
+        detalle.setSubtotal(BigDecimal.ZERO);
+        model.addAttribute("detalle", detalle);
+        model.addAttribute("titulo", "Nuevo Detalle de Venta");
+        model.addAttribute("ventas", ventaService.listarVenta());
+        model.addAttribute("productos", productoService.listarProducto());
+        return "detalle/formulario";
+    }
+
+    @GetMapping("/editar/{code}")
+    public String editar(@PathVariable Long code, Model model, RedirectAttributes flash) {
         return detalleVentaService.buscarPorCode(code)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(detalle -> {
+                    model.addAttribute("detalle", detalle);
+                    model.addAttribute("titulo", "Editar Detalle de Venta");
+                    model.addAttribute("ventas", ventaService.listarVenta());
+                    model.addAttribute("productos", productoService.listarProducto());
+                    return "detalle/formulario";
+                })
+                .orElseGet(() -> {
+                    flash.addFlashAttribute("error", "Detalle no encontrado");
+                    return "redirect:/detallesVentas";
+                });
     }
 
-    @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody DetalleVenta detalleVenta) {
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute DetalleVenta detalleVenta,
+                          @RequestParam(required = false) Long ventaId,
+                          @RequestParam(required = false) Long productoId,
+                          RedirectAttributes flash) {
         try {
-            DetalleVenta nuevoDetalleVenta = detalleVentaService.guardar(detalleVenta);
-            return new ResponseEntity<>(nuevoDetalleVenta, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{code}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long code) {
-        try {
-            if (!detalleVentaService.existeCode(code)) {
-                return ResponseEntity.notFound().build();
+            if (ventaId != null) {
+                ventaService.buscarPorCode(ventaId.intValue()).ifPresent(detalleVenta::setVenta);
             }
+            if (productoId != null) {
+                productoService.buscarPorCode(productoId).ifPresent(detalleVenta::setProducto);
+            }
+            // Calcular subtotal
+            if (detalleVenta.getCantidad() > 0 && detalleVenta.getPrecioUnitario() != null) {
+                BigDecimal cantidadBD = BigDecimal.valueOf(detalleVenta.getCantidad());
+                detalleVenta.setSubtotal(detalleVenta.getPrecioUnitario().multiply(cantidadBD));
+            }
+            detalleVentaService.guardar(detalleVenta);
+            flash.addFlashAttribute("mensaje", "Detalle guardado exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("mensaje", e.getMessage());
+            flash.addFlashAttribute("tipoMensaje", "danger");
+        }
+        return "redirect:/detallesVentas";
+    }
+
+    @PostMapping("/actualizar/{code}")
+    public String actualizar(@PathVariable Long code, @ModelAttribute DetalleVenta detalleVenta, RedirectAttributes flash) {
+        try {
+            // Calcular subtotal
+            if (detalleVenta.getCantidad() > 0 && detalleVenta.getPrecioUnitario() != null) {
+                BigDecimal cantidadBD = BigDecimal.valueOf(detalleVenta.getCantidad());
+                detalleVenta.setSubtotal(detalleVenta.getPrecioUnitario().multiply(cantidadBD));
+            }
+            detalleVentaService.actualizarD(code, detalleVenta);
+            flash.addFlashAttribute("mensaje", "Detalle actualizado exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("mensaje", e.getMessage());
+            flash.addFlashAttribute("tipoMensaje", "danger");
+        }
+        return "redirect:/detallesVentas";
+    }
+
+    @GetMapping("/eliminar/{code}")
+    public String eliminar(@PathVariable Long code, RedirectAttributes flash) {
+        try {
             detalleVentaService.eliminarD(code);
-            return ResponseEntity.noContent().build();
+            flash.addFlashAttribute("mensaje", "Detalle eliminado exitosamente");
+            flash.addFlashAttribute("tipoMensaje", "success");
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            flash.addFlashAttribute("mensaje", "Error al eliminar");
+            flash.addFlashAttribute("tipoMensaje", "danger");
         }
+        return "redirect:/detallesVentas";
     }
 
-    @PutMapping("/{code}")
-    public ResponseEntity<?> actualizar(@PathVariable Long code, @RequestBody DetalleVenta detalleVenta) {
-        try {
-            if (!detalleVentaService.existeCode(code)) {
-                return ResponseEntity.notFound().build();
-            }
-            DetalleVenta detalleVentaActualizada = detalleVentaService.actualizarD(code, detalleVenta);
-            return ResponseEntity.ok(detalleVentaActualizada);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/por-venta/{ventaId}")
+    public String listarPorVenta(@PathVariable int ventaId, Model model) {
+        List<DetalleVenta> todos = detalleVentaService.listarDVenta();
+        List<DetalleVenta> filtrados = todos.stream()
+                .filter(d -> d.getVenta() != null && d.getVenta().getCodigoVenta().equals(Long.valueOf(ventaId)))
+                .toList();
+        model.addAttribute("detalles", filtrados);
+        model.addAttribute("titulo", "Detalles de Venta #" + ventaId);
+        return "detalle/lista";
     }
 }
