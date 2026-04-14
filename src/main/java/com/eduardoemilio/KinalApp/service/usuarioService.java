@@ -95,4 +95,9 @@ public class usuarioService implements IUsuarioService{
             throw new IllegalArgumentException("El rol es obligatorio");
         }
     }
+
+    @Override
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
 }
