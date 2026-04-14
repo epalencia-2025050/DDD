@@ -1,282 +1,136 @@
 /* ============================================
-   GLOBAL CSS - KinalApp / KS SOLUTION'S
-   Basado en Bootstrap 5 + paleta personalizada
+   GLOBAL CSS - KS SOLUTION'S ERP
    ============================================ */
-
-/* Importar fuente moderna (opcional) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Paleta de colores */
     --azul-marino: #1B365D;
     --azul-real: #2A5DA0;
     --naranja: #FF8C00;
-    --gris-carbon: #333F48;
+    --gris-fondo: #f0f2f5;
     --blanco: #FFFFFF;
-
-    /* Sombras y transiciones */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
-    --transition: all 0.2s ease;
-}
-
-* {
-    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --shadow-card: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 body {
-    background-color: var(--blanco);
-    color: var(--gris-carbon);
+    background-color: var(--gris-fondo);
+    font-family: 'Inter', sans-serif;
+    color: #333;
 }
 
-/* ========== BARRA DE NAVEGACIÓN ========== */
-.navbar {
-    background: linear-gradient(135deg, var(--azul-marino) 0%, var(--azul-real) 100%);
-    box-shadow: var(--shadow-md);
-    padding: 0.75rem 1rem;
+/* ========== ESTILO DE TARJETAS (Glassmorphism sutil) ========== */
+.glass-card {
+    background: var(--blanco);
+    border-radius: 20px;
+    border: none;
+    box-shadow: var(--shadow-card);
+    padding: 2rem;
+    margin-bottom: 2rem;
 }
 
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* ========== TABLAS ESTILO PREMIUM ========== */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--shadow-card);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: var(--azul-marino);
+    color: white !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
     font-weight: 700;
-    font-size: 1.4rem;
-    color: var(--blanco) !important;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
+    padding: 1.2rem;
+    border: none;
 }
 
-.navbar-brand img {
-    height: 40px;
-    width: auto;
-    filter: brightness(0) invert(1); /* Si el logo es oscuro, lo vuelve blanco; si ya es claro, quita esta línea */
+.table tbody td {
+    padding: 1rem 1.2rem;
+    vertical-align: middle;
+    border-color: #f1f1f1;
+    color: #444;
 }
 
-.navbar-nav .nav-link {
-    color: rgba(255,255,255,0.85) !important;
-    font-weight: 500;
-    transition: var(--transition);
-    margin: 0 0.25rem;
+.table-hover tbody tr:hover {
+    background-color: rgba(42, 93, 160, 0.05);
+    transition: all 0.2s ease;
 }
 
-.navbar-nav .nav-link:hover {
-    color: var(--blanco) !important;
-    background-color: rgba(255,255,255,0.1);
-    border-radius: 8px;
+/* ID de Venta en Azul Real */
+.venta-id {
+    color: var(--azul-real);
+    font-weight: 700;
+    text-decoration: none;
 }
 
-/* Botón cerrar sesión */
-.btn-outline-light {
-    border-color: rgba(255,255,255,0.5);
-    color: var(--blanco);
-}
-.btn-outline-light:hover {
-    background-color: var(--naranja);
-    border-color: var(--naranja);
-    color: var(--blanco);
+/* ========== FORMULARIOS MODERNOS ========== */
+.form-label {
+    font-weight: 600;
+    color: var(--azul-marino);
+    margin-bottom: 0.5rem;
 }
 
-/* ========== BOTONES GENERALES ========== */
+.form-control, .form-select {
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dce1e7;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--azul-real);
+    box-shadow: 0 0 0 0.25rem rgba(42, 93, 160, 0.15);
+}
+
+/* ========== BOTONES PERSONALIZADOS ========== */
+.btn {
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
 .btn-primary {
     background-color: var(--azul-real);
-    border-color: var(--azul-real);
-    font-weight: 600;
-    transition: var(--transition);
-}
-.btn-primary:hover {
-    background-color: var(--azul-marino);
-    border-color: var(--azul-marino);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+    border: none;
 }
 
-.btn-success {
+.btn-primary:hover {
     background-color: var(--azul-marino);
-    border-color: var(--azul-marino);
-}
-.btn-success:hover {
-    background-color: #0f2a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(42, 93, 160, 0.3);
 }
 
 .btn-warning {
     background-color: var(--naranja);
-    border-color: var(--naranja);
-    color: var(--blanco);
-}
-.btn-warning:hover {
-    background-color: #e07e00;
-    color: var(--blanco);
-}
-
-.btn-danger {
-    background-color: #dc3545;
-}
-.btn-info {
-    background-color: var(--azul-real);
-    border-color: var(--azul-real);
-    color: white;
-}
-.btn-info:hover {
-    background-color: var(--azul-marino);
-    color: white;
-}
-
-/* ========== TABLAS ========== */
-.table {
-    background-color: var(--blanco);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-}
-.table thead th {
-    background-color: var(--azul-marino);
-    color: var(--blanco);
-    border-bottom: none;
-    font-weight: 600;
-    padding: 12px 8px;
-}
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(42,93,160,0.05);
-}
-.table-hover tbody tr:hover {
-    background-color: rgba(255,140,0,0.08);
-    transition: var(--transition);
-}
-
-/* ========== FORMULARIOS ========== */
-.form-control, .form-select {
-    border: 1px solid #ced4da;
-    border-radius: 10px;
-    padding: 10px 12px;
-    transition: var(--transition);
-}
-.form-control:focus, .form-select:focus {
-    border-color: var(--naranja);
-    box-shadow: 0 0 0 0.2rem rgba(255,140,0,0.25);
-}
-label {
-    font-weight: 600;
-    color: var(--azul-marino);
-    margin-bottom: 6px;
-}
-
-/* Tarjetas (card) */
-.card {
     border: none;
-    border-radius: 20px;
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-}
-.card-header {
-    background: linear-gradient(135deg, var(--azul-marino), var(--azul-real));
-    color: white;
-    border-bottom: none;
-    padding: 16px 20px;
-}
-.card-header h3 {
-    margin: 0;
-    font-weight: 600;
+    color: white !important;
 }
 
-/* ========== ALERTAS (mensajes flash) ========== */
-.alert {
-    border-radius: 12px;
-    border-left: 6px solid;
-    font-weight: 500;
-}
-.alert-success {
-    background-color: #d4edda;
-    border-left-color: #28a745;
-    color: #155724;
-}
-.alert-danger {
-    background-color: #f8d7da;
-    border-left-color: #dc3545;
-    color: #721c24;
-}
-.alert-warning {
-    background-color: #fff3cd;
-    border-left-color: var(--naranja);
-    color: #856404;
-}
-.alert-info {
-    background-color: #d1ecf1;
-    border-left-color: var(--azul-real);
-    color: #0c5460;
+.btn-warning:hover {
+    background-color: #e67e00;
+    transform: translateY(-2px);
 }
 
-/* ========== BADGES ========== */
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 500;
-}
-.bg-success {
-    background-color: #28a745 !important;
-}
-.bg-secondary {
-    background-color: var(--gris-carbon) !important;
-}
-.bg-warning {
-    background-color: var(--naranja) !important;
-    color: white;
-}
-
-/* ========== PAGINACIÓN / BOTONES DE ACCIÓN ========== */
-.btn-sm {
-    border-radius: 8px;
-    margin: 0 2px;
-}
-
-/* ========== JUMBOTRON / MENÚ ========== */
-.jumbotron {
-    background-color: #f8f9fc;
-    border-radius: 24px;
-    padding: 2rem;
-    box-shadow: var(--shadow-sm);
-}
-.display-4 {
-    color: var(--azul-marino);
-    font-weight: 700;
-}
-
-/* ========== LOGIN Y REGISTRO ========== */
-.card.shadow {
-    border-radius: 24px;
-}
-.card-header.bg-primary, .card-header.bg-success {
-    background: linear-gradient(135deg, var(--azul-marino), var(--azul-real)) !important;
-}
-.card-header.bg-success {
-    background: linear-gradient(135deg, #1e7e34, #28a745) !important;
-}
-.btn-link {
+/* ========== BADGES Y ESTADOS ========== */
+.badge-total {
+    background-color: rgba(42, 93, 160, 0.1);
     color: var(--azul-real);
-    text-decoration: none;
-}
-.btn-link:hover {
-    color: var(--naranja);
-}
-
-/* ========== RESPONSIVE AJUSTES ========== */
-@media (max-width: 768px) {
-    .navbar-brand {
-        font-size: 1.2rem;
-    }
-    .table {
-        font-size: 0.85rem;
-    }
-    .btn {
-        font-size: 0.85rem;
-    }
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
 }
 
-/* ========== FOOTER (opcional) ========== */
-footer {
-    background-color: var(--gris-carbon);
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    margin-top: 3rem;
-    font-size: 0.8rem;
+.badge-status {
+    padding: 0.5rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
