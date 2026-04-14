@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<head>
+    <title>Lista de Detalles de Venta</title>
+</head>
+<body>
+<div th:fragment="content">
+    <h1 class="mb-4" th:text="${titulo}">Detalles de Venta</h1>
+    <div class="mb-3">
+        <a th:href="@{/detallesVentas/nuevo}" class="btn btn-primary">+ Nuevo Detalle</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Código Detalle</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+            <th>Venta (código)</th>
+            <th>Producto</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${detalles}">
+            <td th:text="${d.codigoDetalleVenta}"></td>
+            <td th:text="${d.cantidad}"></td>
+            <td th:text="${d.precioUnitario}"></td>
+            <td th:text="${d.subtotal}"></td>
+            <td th:text="${d.venta != null ? d.venta.codigoVenta : ''}"></td>
+            <td th:text="${d.producto != null ? d.producto.nombreProducto : ''}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(detalles)}">
+            <td colspan="6" class="text-center">No hay detalles de venta registrados</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
