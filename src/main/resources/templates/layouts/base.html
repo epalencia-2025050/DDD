@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,13 +96,15 @@
         <a href="/clientes" class="nav-link"><i class="bi bi-person-lines-fill"></i> Clientes</a>
         <a href="/productos" class="nav-link"><i class="bi bi-box-seam"></i> Productos</a>
         <a href="/ventas" class="nav-link"><i class="bi bi-cart4"></i> Nueva Venta</a>
-        <!-- Cambiado: Facturación por Detalles -->
         <a href="/detallesVentas" class="nav-link"><i class="bi bi-list-ul"></i> Detalles</a>
 
+        <!-- ✅ LOGOUT CORREGIDO: formulario POST -->
         <div class="position-absolute bottom-0 w-100 p-3">
-            <a th:href="@{/logout}" class="btn btn-outline-light w-100 rounded-pill border-0">
-                <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
-            </a>
+            <form th:action="@{/logout}" method="post" class="w-100">
+                <button type="submit" class="btn btn-outline-light w-100 rounded-pill border-0">
+                    <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+                </button>
+            </form>
         </div>
     </nav>
 </div>
@@ -110,8 +113,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold text-dark" th:text="${titulo}">Título</h4>
         <div class="user-pill d-flex align-items-center">
-            <span class="px-3 fw-bold text-primary small"
-                  th:text="${session.usuarioLogueado?.username ?: 'Invitado'}">User</span>
+            <!-- ✅ USUARIO CORREGIDO: usando Spring Security -->
+            <span class="px-3 fw-bold text-primary small" sec:authentication="name">Usuario</span>
             <i class="bi bi-person-circle fs-4 text-primary"></i>
         </div>
     </div>
