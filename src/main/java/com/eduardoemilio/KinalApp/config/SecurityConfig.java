@@ -21,6 +21,26 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/login", "/registro").permitAll()
+                        //XD XD XD XD XD XD
+                        .requestMatchers("/clientes/eliminar/**",
+                                "/productos/eliminar/**",
+                                "/usuarios/eliminar/**",
+                                "/ventas/eliminar/**",
+                                "/detallesVentas/eliminar/**").hasRole("ADMIN")
+
+                        .requestMatchers("/clientes/editar/**", "/clientes/actualizar/**",
+                                "/productos/editar/**", "/productos/actualizar/**",
+                                "/usuarios/editar/**", "/usuarios/actualizar/**",
+                                "/ventas/editar/**", "/ventas/actualizar/**",
+                                "/detallesVentas/editar/**", "/detallesVentas/actualizar/**").hasRole("ADMIN")
+
+                        .requestMatchers("/clientes", "/clientes/nuevo", "/clientes/guardar", "/clientes/activos/**",
+                                "/productos", "/productos/nuevo", "/productos/guardar", "/productos/activos/**",
+                                "/usuarios", "/usuarios/nuevo", "/usuarios/guardar", "/usuarios/activos/**",
+                                "/ventas", "/ventas/nuevo", "/ventas/guardar", "/ventas/activos/**", "/ventas/ver/**",
+                                "/detallesVentas", "/detallesVentas/nuevo", "/detallesVentas/guardar",
+                                "/menu", "/").hasAnyRole("ADMIN", "USER")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -42,6 +62,7 @@ public class SecurityConfig {
                     .map(usuario -> User.builder()
                             .username(usuario.getEmail())
                             .password(usuario.getPassword())
+                            .roles(usuario.getRol())
                             .build())
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
         };
