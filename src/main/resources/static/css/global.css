@@ -1,0 +1,136 @@
+/* ============================================
+   GLOBAL CSS - KS SOLUTION'S ERP
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --azul-marino: #1B365D;
+    --azul-real: #2A5DA0;
+    --naranja: #FF8C00;
+    --gris-fondo: #f0f2f5;
+    --blanco: #FFFFFF;
+    --shadow-card: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+body {
+    background-color: var(--gris-fondo);
+    font-family: 'Inter', sans-serif;
+    color: #333;
+}
+
+/* ========== ESTILO DE TARJETAS (Glassmorphism sutil) ========== */
+.glass-card {
+    background: var(--blanco);
+    border-radius: 20px;
+    border: none;
+    box-shadow: var(--shadow-card);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ========== TABLAS ESTILO PREMIUM ========== */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--shadow-card);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: var(--azul-marino);
+    color: white !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 1.2rem;
+    border: none;
+}
+
+.table tbody td {
+    padding: 1rem 1.2rem;
+    vertical-align: middle;
+    border-color: #f1f1f1;
+    color: #444;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(42, 93, 160, 0.05);
+    transition: all 0.2s ease;
+}
+
+/* ID de Venta en Azul Real */
+.venta-id {
+    color: var(--azul-real);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* ========== FORMULARIOS MODERNOS ========== */
+.form-label {
+    font-weight: 600;
+    color: var(--azul-marino);
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dce1e7;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--azul-real);
+    box-shadow: 0 0 0 0.25rem rgba(42, 93, 160, 0.15);
+}
+
+/* ========== BOTONES PERSONALIZADOS ========== */
+.btn {
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--azul-real);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--azul-marino);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(42, 93, 160, 0.3);
+}
+
+.btn-warning {
+    background-color: var(--naranja);
+    border: none;
+    color: white !important;
+}
+
+.btn-warning:hover {
+    background-color: #e67e00;
+    transform: translateY(-2px);
+}
+
+/* ========== BADGES Y ESTADOS ========== */
+.badge-total {
+    background-color: rgba(42, 93, 160, 0.1);
+    color: var(--azul-real);
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.badge-status {
+    padding: 0.5rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
