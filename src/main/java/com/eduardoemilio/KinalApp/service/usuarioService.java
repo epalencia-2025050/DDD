@@ -2,6 +2,7 @@ package com.eduardoemilio.KinalApp.service;
 
 import com.eduardoemilio.KinalApp.entity.Usuario;
 import com.eduardoemilio.KinalApp.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,22 @@ public class usuarioService implements IUsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Constructor con inyección de PasswordEncoder
     public usuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public Usuario guardarU(Usuario usuario) {
+        long totalUsuarios = usuarioRepository.count();
+        if (totalUsuarios == 0) {
+            usuario.setRol("ADMIN");
+        } else {
+            usuario.setRol("USER");
+        }
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setEstado(1);
+        return usuarioRepository.save(usuario);
     }
 
     @Override
@@ -29,25 +42,11 @@ public class usuarioService implements IUsuarioService {
     }
 
     @Override
-    public Usuario guardarU(Usuario usuario) {
-        validarUsuario(usuario);
-        if (usuario.getEstado() == 0) {
-            usuario.setEstado(1);
-        }
-        // Encriptar la contraseña si no está ya encriptada
-        if (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2a$")) {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        }
-        return usuarioRepository.save(usuario);
-    }
-
-    @Override
     public Usuario ActualizarU(Long code, Usuario usuario) {
         if (!usuarioRepository.existsById(code)) {
             throw new RuntimeException("Usuario no se encuentra con el codigoUsuario " + code);
         }
         Usuario existing = usuarioRepository.findById(code).get();
-        // Si la contraseña no se modificó, conservar la existente (ya encriptada)
         if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
             usuario.setPassword(existing.getPassword());
         } else if (!usuario.getPassword().startsWith("$2a$")) {
