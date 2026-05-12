@@ -18,11 +18,10 @@ public class RegistroController {
         this.usuarioService = usuarioService;
     }
 
-    // ✅ NUEVO: Método para mostrar el formulario de registro
     @GetMapping("/registro")
     public String mostrarFormularioRegistro(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "registro";   // Asegúrate de que registro.html esté en templates/registro.html
+        return "registro";
     }
 
     @PostMapping("/registro")
@@ -35,8 +34,6 @@ public class RegistroController {
             u.setUsername(username);
             u.setEmail(email);
             u.setPassword(password);
-            u.setRol("USER");
-            u.setEstado(1);
             usuarioService.guardarU(u);
             flash.addFlashAttribute("mensaje", "Registro exitoso. Ahora inicia sesión.");
             return "redirect:/login";
