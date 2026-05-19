@@ -113,6 +113,11 @@ public class clienteService implements IClienteService {
         //Retorna true o false
     }
 
+    @Override
+    public boolean existeDpi(String dpi) {
+        return clienteRepository.existsById(dpi);
+    }
+
     //Metodo privado(Solo pueden utilizarse dentro de la clase)
     private void validarCliente(Cliente cliente){
         /*
