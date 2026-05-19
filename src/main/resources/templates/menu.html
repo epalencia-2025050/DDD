@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/base :: html}">
 <head>
     <title>Dashboard | KS Solution's</title>
 </head>
@@ -8,7 +10,8 @@
     <div class="row">
         <div class="col-12">
             <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
-                <h1 class="display-5 fw-bold text-primary">¡Bienvenido, <span th:text="${session.usuarioLogueado?.username}">Usuario</span>!</h1>
+                <!-- CAMBIO: usar Spring Security para obtener el nombre -->
+                <h1 class="display-5 fw-bold text-primary">¡Bienvenido, <span sec:authentication="name">Usuario</span>!</h1>
                 <p class="text-muted">Panel de Control Central - KS Solution's ERP System</p>
                 <hr>
                 <p><i class="bi bi-calendar-event"></i> <strong>Sesión Activa</strong> - <span th:text="${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}"></span></p>

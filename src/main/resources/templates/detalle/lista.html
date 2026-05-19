@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layouts/base :: html}">
 <head>
     <title>Lista de Detalles de Venta</title>
 </head>
@@ -30,7 +30,7 @@
             <td th:text="${d.producto != null ? d.producto.nombreProducto : ''}"></td>
         </tr>
         <tr th:if="${#lists.isEmpty(detalles)}">
-            <td colspan="6" class="text-center">No hay detalles de venta registrados</td>
+            <td colspan="6" class="text-center">No hay detalles de venta registrados<\/td>
         </tr>
         </tbody>
     </table>

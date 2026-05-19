@@ -2,8 +2,12 @@ package com.eduardoemilio.KinalApp.controller;
 
 import com.eduardoemilio.KinalApp.entity.Usuario;
 import com.eduardoemilio.KinalApp.service.IUsuarioService;
+import com.eduardoemilio.KinalApp.service.IVentaService;
+import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -14,9 +18,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final IUsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(IUsuarioService usuarioService) {
+    public UsuarioController(IUsuarioService usuarioService, IVentaService ventaService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -49,7 +55,22 @@ public class UsuarioController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Usuario usuario, RedirectAttributes flash) {
+    public String guardar(@Valid @ModelAttribute("usuario") Usuario usuario,
+                          BindingResult result,
+                          Model model,
+                          RedirectAttributes flash) {
+        if (usuario.getEmail() != null && usuarioService.existeEmail(usuario.getEmail())) {
+            result.rejectValue("email", "error.usuario", "Ya existe un usuario con ese email");
+        }
+        if (usuario.getUsername() != null && usuarioService.existeUsername(usuario.getUsername())) {
+            result.rejectValue("username", "error.usuario", "Ya existe un usuario con ese nombre");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Nuevo Usuario");
+            return "usuario/formulario";
+        }
+
         try {
             usuarioService.guardarU(usuario);
             flash.addFlashAttribute("mensaje", "Usuario guardado exitosamente");
@@ -62,7 +83,44 @@ public class UsuarioController {
     }
 
     @PostMapping("/actualizar/{code}")
-    public String actualizar(@PathVariable Long code, @ModelAttribute Usuario usuario, RedirectAttributes flash) {
+    public String actualizar(@PathVariable Long code,
+                             @Valid @ModelAttribute("usuario") Usuario usuario,
+                             BindingResult result,
+                             Model model,
+                             RedirectAttributes flash) {
+
+        Usuario existing = usuarioService.buscarPorcode(code).orElse(null);
+        if (existing == null) {
+            flash.addFlashAttribute("error", "Usuario no encontrado");
+            return "redirect:/usuarios";
+        }
+
+        // Validar unicidad excluyendo el actual
+        if (usuario.getEmail() != null && !usuario.getEmail().equals(existing.getEmail())
+                && usuarioService.existeEmail(usuario.getEmail())) {
+            result.rejectValue("email", "error.usuario", "Ya existe un usuario con ese email");
+        }
+        if (usuario.getUsername() != null && !usuario.getUsername().equals(existing.getUsername())
+                && usuarioService.existeUsername(usuario.getUsername())) {
+            result.rejectValue("username", "error.usuario", "Ya existe un usuario con ese nombre");
+        }
+
+        // Manejo de contraseña
+        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+            usuario.setPassword(existing.getPassword());
+        } else {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+
+        usuario.setCodigoUsuario(code);
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Editar Usuario");
+            // Si necesitas la lista de ventas en la vista (por algún select), descomenta:
+            // model.addAttribute("ventas", ventaService.listarVenta());
+            return "usuario/formulario";
+        }
+
         try {
             usuarioService.ActualizarU(code, usuario);
             flash.addFlashAttribute("mensaje", "Usuario actualizado exitosamente");
