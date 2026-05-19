@@ -2,6 +2,7 @@ package com.eduardoemilio.KinalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,12 +13,25 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_producto")
     private Long codigoProducto;
+
+    @NotBlank(message = "El nombre del producto es obligatorio")
+    @Size(min = 3, max = 80, message = "El nombre debe tener entre 3 y 80 caracteres")
     @Column(nullable = false)
     private String nombreProducto;
+
+    @NotNull(message = "El precio es obligatorio")
+    @Positive(message = "El precio debe ser mayor a 0")
+    @DecimalMin(value = "0.01", message = "El precio mínimo es 0.01")
     @Column(precision = 10, scale = 2,nullable = false)
     private BigDecimal precio;
+
+    @NotNull(message = "El stock es obligatorio")
+    @Min(value = 0, message = "El stock no puede ser negativo")
     @Column(nullable = false)
     private int stock;
+
+    @Min(0)
+    @Max(1)
     @Column(nullable = false)
     private int estado;
 

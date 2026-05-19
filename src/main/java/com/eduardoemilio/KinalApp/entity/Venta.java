@@ -2,6 +2,7 @@ package com.eduardoemilio.KinalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,10 +16,20 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_venta")
     private Long codigoVenta;
+
+    @NotNull(message = "La fecha de venta es obligatoria")
+    @PastOrPresent(message = "La fecha no puede ser futura")
     @Column(nullable = false)
     private LocalDate fechaVenta;
+
+    @NotNull(message = "El total es obligatorio")
+    @PositiveOrZero(message = "El total no puede ser negativo")
+    @DecimalMin(value = "0.00", message = "El total debe ser mayor o igual a 0")
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal total;
+
+    @Min(value = 0, message = "Estado inválido")
+    @Max(value = 1, message = "Estado inválido")
     @Column(nullable = false)
     private int estado;
 
@@ -26,10 +37,12 @@ public class Venta {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull(message = "Debe seleccionar un cliente")
     @JoinColumn(name = "clientes_dpi_cliente", referencedColumnName = "dpi_cliente", nullable = false)
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull(message = "Debe seleccionar un usuario")
     @JoinColumn(name = "usuarios_codigo_usuario", referencedColumnName = "codigo_usuario", nullable = false)
     private Usuario usuario;
 

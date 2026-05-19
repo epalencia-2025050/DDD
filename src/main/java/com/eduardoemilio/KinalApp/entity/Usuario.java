@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
@@ -14,14 +15,24 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
     private Long codigoUsuario;
+
+    @NotBlank(message = "El nombre de usuario es obligatorio")
+    @Size(min = 4, max = 20, message = "El username debe tener entre 4 y 20 caracteres validos")
     @Column(nullable = false)
     private String username;
-    @Column(nullable = false)
-    private String password;
+
+    @Pattern(regexp = "^.{8,}$", message = "La contraseña debe tener al menos 8 caracteres")    private String password;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Debe ser un email válido")
     @Column(nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String rol;
+
+    @Min(value = 0, message = "Estado inválido")
+    @Max(value = 1, message = "Estado inválido")
     @Column(nullable = false)
     private int estado;
 
