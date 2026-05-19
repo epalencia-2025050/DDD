@@ -95,7 +95,6 @@ public class UsuarioController {
             return "redirect:/usuarios";
         }
 
-        // Validar unicidad excluyendo el actual
         if (usuario.getEmail() != null && !usuario.getEmail().equals(existing.getEmail())
                 && usuarioService.existeEmail(usuario.getEmail())) {
             result.rejectValue("email", "error.usuario", "Ya existe un usuario con ese email");
@@ -105,7 +104,6 @@ public class UsuarioController {
             result.rejectValue("username", "error.usuario", "Ya existe un usuario con ese nombre");
         }
 
-        // Manejo de contraseña
         if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
             usuario.setPassword(existing.getPassword());
         } else {
@@ -116,8 +114,6 @@ public class UsuarioController {
 
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Editar Usuario");
-            // Si necesitas la lista de ventas en la vista (por algún select), descomenta:
-            // model.addAttribute("ventas", ventaService.listarVenta());
             return "usuario/formulario";
         }
 
