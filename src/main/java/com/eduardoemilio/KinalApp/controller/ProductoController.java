@@ -2,8 +2,10 @@ package com.eduardoemilio.KinalApp.controller;
 
 import com.eduardoemilio.KinalApp.entity.Producto;
 import com.eduardoemilio.KinalApp.service.IProductoService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -49,7 +51,15 @@ public class ProductoController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Producto producto, RedirectAttributes flash) {
+    public String guardar(@Valid @ModelAttribute("producto") Producto producto,
+                          BindingResult result,
+                          Model model,
+                          RedirectAttributes flash) {
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Nuevo Producto");
+            return "producto/formulario";
+        }
+
         try {
             productoService.guardar(producto);
             flash.addFlashAttribute("mensaje", "Producto guardado exitosamente");
@@ -62,7 +72,16 @@ public class ProductoController {
     }
 
     @PostMapping("/actualizar/{code}")
-    public String actualizar(@PathVariable Long code, @ModelAttribute Producto producto, RedirectAttributes flash) {
+    public String actualizar(@PathVariable Long code,
+                             @Valid @ModelAttribute("producto") Producto producto,
+                             BindingResult result,
+                             Model model,
+                             RedirectAttributes flash) {
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Editar Producto");
+            return "producto/formulario";
+        }
+
         try {
             productoService.ActualizarP(code, producto);
             flash.addFlashAttribute("mensaje", "Producto actualizado exitosamente");
