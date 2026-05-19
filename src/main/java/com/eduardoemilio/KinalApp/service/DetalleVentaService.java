@@ -43,7 +43,6 @@ public class DetalleVentaService implements IDetalleVentaService {
     @Override
     @Transactional
     public DetalleVenta guardar(DetalleVenta detalle) {
-        // Validaciones
         if (detalle.getVenta() == null) {
             throw new IllegalArgumentException("Debe seleccionar una venta");
         }
@@ -57,25 +56,21 @@ public class DetalleVentaService implements IDetalleVentaService {
             throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
         }
 
-        // 1. Decrementar stock
         Producto producto = detalle.getProducto();
         if (producto.getStock() < detalle.getCantidad()) {
             throw new IllegalArgumentException("Stock insuficiente. Stock actual: " + producto.getStock());
         }
         producto.setStock(producto.getStock() - detalle.getCantidad());
-        productoService.actualizar(producto);  // Asegúrate de tener inyectado IProductoService
+        productoService.actualizar(producto);
 
-        // 2. Calcular subtotal (si no viene ya calculado)
         if (detalle.getSubtotal() == null || detalle.getSubtotal().compareTo(BigDecimal.ZERO) == 0) {
             BigDecimal subtotal = BigDecimal.valueOf(detalle.getCantidad())
                     .multiply(detalle.getPrecioUnitario());
             detalle.setSubtotal(subtotal);
         }
 
-        // 3. Guardar el detalle
         DetalleVenta detalleGuardado = detalleVentaRepository.save(detalle);
 
-        // 4. Recalcular y actualizar el total de la venta
         Venta venta = detalle.getVenta();
         BigDecimal nuevoTotal = calcularTotalVenta(venta.getCodigoVenta());
         venta.setTotal(nuevoTotal);
