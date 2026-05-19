@@ -45,7 +45,6 @@
             margin-bottom: 0;
         }
 
-        /* Estilo específico para tu logo */
         .brand-icon-img {
             height: 45px;
             width: auto;
@@ -111,12 +110,23 @@
                 <div class="card-body p-4 p-md-5">
                     <h4 class="text-center mb-4 fw-bold text-dark">Bienvenido</h4>
 
+                    <!-- Mensajes de Spring Security -->
+                    <div th:if="${param.error}" class="alert alert-danger mt-2 py-2 small border-0 shadow-sm text-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Correo electrónico o contraseña incorrectos
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success mt-2 py-2 small border-0 shadow-sm text-center" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Has cerrado sesión correctamente
+                    </div>
+
                     <form th:action="@{/login}" method="post">
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-secondary text-uppercase">Correo electrónico</label>
                             <div class="input-group shadow-sm">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                <input type="email" name="email" class="form-control"
+                                <!-- CAMBIO IMPORTANTE: name="username" -->
+                                <input type="email" name="username" class="form-control"
                                        placeholder="usuario@kssolutions.com" required autofocus>
                             </div>
                         </div>
@@ -140,11 +150,6 @@
                         <a th:href="@{/registro}" class="text-decoration-none fw-bold" style="color: var(--naranja);">
                             Solicitar acceso / Registro
                         </a>
-                    </div>
-
-                    <div th:if="${error}" class="alert alert-danger mt-4 py-2 small border-0 shadow-sm text-center" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <span th:text="${error}"></span>
                     </div>
                 </div>
             </div>

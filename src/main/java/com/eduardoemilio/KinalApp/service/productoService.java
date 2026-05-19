@@ -56,6 +56,11 @@ public class productoService implements IProductoService {
     }
 
     @Override
+    public Producto actualizar(Producto producto) {
+        return productoRepository.save(producto);
+    }
+
+    @Override
     public void eliminarP(Long code) {
         if (!productoRepository.existsById(code)) {
             throw new RuntimeException("El Producto no se encuentra con el codigo" + code);

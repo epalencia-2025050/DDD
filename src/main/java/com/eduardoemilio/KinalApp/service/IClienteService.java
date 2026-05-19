@@ -40,7 +40,7 @@ public interface IClienteService {
     //Metodo para listar a los CLientes por su estado 0 o 1
     //Busca lista los usuarios dependiendo del numero
     List<Cliente> clienteEstado(int estado);
-
+    boolean existeDpi(String dpi);
 
 
 

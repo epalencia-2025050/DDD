@@ -1,82 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
 <head>
-    <title th:text="${titulo}">Usuario</title>
+    <title th:text="${titulo}">Formulario Usuario</title>
 </head>
 <body>
 <div th:fragment="content">
     <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-7">
-                <div class="card shadow border-0">
-                    <div class="card-header py-3 bg-dark">
-                        <h4 class="mb-0 d-flex align-items-center text-white">
-                            <i class="bi bi-shield-lock me-2 text-warning"></i>
-                            <span th:text="${titulo}">Gestión de Usuario</span>
-                        </h4>
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0" th:text="${titulo}"></h4>
                     </div>
                     <div class="card-body p-4">
                         <form th:action="${usuario.codigoUsuario != null} ? @{/usuarios/actualizar/{code}(code=${usuario.codigoUsuario})} : @{/usuarios/guardar}"
                               th:object="${usuario}" method="post">
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold text-secondary">Nombre de Usuario (Username)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-person-fill"></i></span>
+                            <fieldset class="border p-3 mb-3">
+                                <legend class="w-auto px-2">Datos de Acceso</legend>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Username <span class="text-danger">*</span></label>
                                     <input type="text" th:field="*{username}" class="form-control"
-                                           placeholder="Ej: jper_admin" required>
+                                           th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+                                    <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback" th:errors="*{username}"></div>
                                 </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold text-secondary">Correo Electrónico</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-envelope-at"></i></span>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
                                     <input type="email" th:field="*{email}" class="form-control"
-                                           placeholder="usuario@kssolutions.com" required>
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                                    <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback" th:errors="*{email}"></div>
                                 </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold text-secondary">Contraseña</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-key-fill"></i></span>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Contraseña <span class="text-danger">*</span></label>
                                     <input type="password" th:field="*{password}" class="form-control"
-                                           placeholder="Ingrese una clave segura" required>
+                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                                    <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback" th:errors="*{password}"></div>
+                                    <div class="form-text">Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.</div>
                                 </div>
-                                <div class="form-text">La contraseña se encriptará automáticamente al guardar.</div>
-                            </div>
+                            </fieldset>
 
-                            <hr class="my-4 opacity-25">
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-secondary">Rol del Sistema</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="bi bi-person-gear"></i></span>
-                                        <select th:field="*{rol}" class="form-select border-2">
-                                            <option value="ADMIN">ADMINISTRADOR</option>
-                                            <option value="USER">USUARIO ESTÁNDAR</option>
+                            <fieldset class="border p-3 mb-3">
+                                <legend class="w-auto px-2">Configuración de Cuenta</legend>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Rol</label>
+                                        <select th:field="*{rol}" class="form-select">
+                                            <option value="USER">Usuario</option>
+                                            <option value="ADMIN">Administrador</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Estado</label>
+                                        <select th:field="*{estado}" class="form-select">
+                                            <option th:value="1">Activo</option>
+                                            <option th:value="0">Inactivo</option>
                                         </select>
                                     </div>
                                 </div>
+                            </fieldset>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-secondary">Estado de Cuenta</label>
-                                    <select th:field="*{estado}" class="form-select border-2">
-                                        <option th:value="1">🟢 Habilitado</option>
-                                        <option th:value="0">🔴 Deshabilitado</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end gap-3 mt-5">
-                                <a th:href="@{/usuarios}" class="btn btn-outline-secondary px-4">
-                                    Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-primary px-5 shadow-sm">
-                                    <i class="bi bi-person-check me-1"></i> Guardar Usuario
-                                </button>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/usuarios}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
                             </div>
                         </form>
                     </div>

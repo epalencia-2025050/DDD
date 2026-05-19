@@ -4,8 +4,10 @@ import com.eduardoemilio.KinalApp.entity.Venta;
 import com.eduardoemilio.KinalApp.service.IVentaService;
 import com.eduardoemilio.KinalApp.service.IClienteService;
 import com.eduardoemilio.KinalApp.service.IUsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -63,17 +65,27 @@ public class VentaController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Venta venta,
+    public String guardar(@Valid @ModelAttribute("venta") Venta venta,
+                          BindingResult result,
                           @RequestParam(required = false) String clienteDpi,
                           @RequestParam(required = false) Long usuarioCode,
+                          Model model,
                           RedirectAttributes flash) {
+        if (clienteDpi != null && !clienteDpi.isEmpty()) {
+            clienteService.bucarPorDPI(clienteDpi).ifPresent(venta::setCliente);
+        }
+        if (usuarioCode != null) {
+            usuarioService.buscarPorcode(usuarioCode).ifPresent(venta::setUsuario);
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Nueva Venta");
+            model.addAttribute("clientes", clienteService.listarTodos());
+            model.addAttribute("usuarios", usuarioService.listarUsuario());
+            return "venta/formulario";
+        }
+
         try {
-            if (clienteDpi != null && !clienteDpi.isEmpty()) {
-                clienteService.bucarPorDPI(clienteDpi).ifPresent(venta::setCliente);
-            }
-            if (usuarioCode != null) {
-                usuarioService.buscarPorcode(usuarioCode).ifPresent(venta::setUsuario);
-            }
             ventaService.guardar(venta);
             flash.addFlashAttribute("mensaje", "Venta guardada exitosamente");
             flash.addFlashAttribute("tipoMensaje", "success");
@@ -85,7 +97,18 @@ public class VentaController {
     }
 
     @PostMapping("/actualizar/{code}")
-    public String actualizar(@PathVariable int code, @ModelAttribute Venta venta, RedirectAttributes flash) {
+    public String actualizar(@PathVariable int code,
+                             @Valid @ModelAttribute("venta") Venta venta,
+                             BindingResult result,
+                             Model model,
+                             RedirectAttributes flash) {
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Editar Venta");
+            model.addAttribute("clientes", clienteService.listarTodos());
+            model.addAttribute("usuarios", usuarioService.listarUsuario());
+            return "venta/formulario";
+        }
+
         try {
             ventaService.ActualizarV(code, venta);
             flash.addFlashAttribute("mensaje", "Venta actualizada exitosamente");

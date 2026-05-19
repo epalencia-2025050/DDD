@@ -2,6 +2,7 @@ package com.eduardoemilio.KinalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
@@ -9,14 +10,28 @@ import java.util.List;
 @Table(name = "clientes")
 public class Cliente {
     @Id
+    @NotBlank(message = "El DPI es obligatorio")
+    @Pattern(regexp = "^\\d{13}$", message = "El DPI debe tener 13 numéricos")
     @Column(name = "dpi_cliente")
     private String DPICliente;
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
     @Column(nullable = false)
     private String nombreCliente;
+
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(min = 2, max = 50, message = "El apellido debe tener entre 2 y 50 caracteres")
     @Column(nullable = false)
     private String apellidoCliente;
+
+    @NotBlank(message = "La dirección es obligatoria")
+    @Size(max = 100, message = "La dirección no puede superar los 100 caracteres")
     @Column(nullable = false)
     private String direccion;
+
+    @Min(0)
+    @Max(1)
     @Column(nullable = false)
     private int estado;
 

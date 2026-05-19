@@ -2,8 +2,10 @@ package com.eduardoemilio.KinalApp.controller;
 
 import com.eduardoemilio.KinalApp.entity.Cliente;
 import com.eduardoemilio.KinalApp.service.IClienteService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -49,7 +51,19 @@ public class ClienteController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Cliente cliente, RedirectAttributes flash) {
+    public String guardar(@Valid @ModelAttribute("cliente") Cliente cliente,
+                          BindingResult result,
+                          Model model,
+                          RedirectAttributes flash) {
+        if (cliente.getDPICliente() != null && clienteService.existeDpi(cliente.getDPICliente())) {
+            result.rejectValue("DPICliente", "error.cliente", "Ya existe un cliente con ese DPI");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Nuevo Cliente");
+            return "cliente/formulario";
+        }
+
         try {
             clienteService.guardar(cliente);
             flash.addFlashAttribute("mensaje", "Cliente guardado exitosamente");
@@ -62,7 +76,21 @@ public class ClienteController {
     }
 
     @PostMapping("/actualizar/{dpi}")
-    public String actualizar(@PathVariable String dpi, @ModelAttribute Cliente cliente, RedirectAttributes flash) {
+    public String actualizar(@PathVariable String dpi,
+                             @Valid @ModelAttribute("cliente") Cliente cliente,
+                             BindingResult result,
+                             Model model,
+                             RedirectAttributes flash) {
+        if (cliente.getDPICliente() != null && !cliente.getDPICliente().equals(dpi)
+                && clienteService.existeDpi(cliente.getDPICliente())) {
+            result.rejectValue("DPICliente", "error.cliente", "Ya existe un cliente con ese DPI");
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Editar Cliente");
+            return "cliente/formulario";
+        }
+
         try {
             clienteService.actualizar(dpi, cliente);
             flash.addFlashAttribute("mensaje", "Cliente actualizado exitosamente");

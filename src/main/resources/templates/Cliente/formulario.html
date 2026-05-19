@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/base :: html}">
 <head>
-    <title th:text="${titulo}">Cliente</title>
+    <title th:text="${titulo}">Formulario Cliente</title>
 </head>
 <body>
 <div th:fragment="content">
@@ -10,64 +10,62 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-primary text-white py-3">
-                        <h4 class="mb-0">
-                            <i class="bi bi-person-fill-gear me-2"></i>
-                            <span th:text="${titulo}"></span>
-                        </h4>
+                        <h4 class="mb-0" th:text="${titulo}"></h4>
                     </div>
                     <div class="card-body p-4">
                         <form th:action="${cliente.DPICliente != null} ? @{/clientes/actualizar/{dpi}(dpi=${cliente.DPICliente})} : @{/clientes/guardar}"
                               th:object="${cliente}" method="post">
 
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <label class="form-label fw-bold text-secondary">DPI / Identificación</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="bi bi-card-text"></i></span>
+                            <!-- Agrupación con fieldset -->
+                            <fieldset class="border p-3 mb-3">
+                                <legend class="w-auto px-2">Información Personal</legend>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{nombreCliente}" class="form-control"
+                                               th:classappend="${#fields.hasErrors('nombreCliente')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('nombreCliente')}" class="invalid-feedback" th:errors="*{nombreCliente}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Apellido <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{apellidoCliente}" class="form-control"
+                                               th:classappend="${#fields.hasErrors('apellidoCliente')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('apellidoCliente')}" class="invalid-feedback" th:errors="*{apellidoCliente}"></div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-bold">Dirección <span class="text-danger">*</span></label>
+                                        <textarea th:field="*{direccion}" class="form-control" rows="2"
+                                                  th:classappend="${#fields.hasErrors('direccion')} ? 'is-invalid' : ''"></textarea>
+                                        <div th:if="${#fields.hasErrors('direccion')}" class="invalid-feedback" th:errors="*{direccion}"></div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="border p-3 mb-3">
+                                <legend class="w-auto px-2">Datos de Identificación</legend>
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold">DPI <span class="text-danger">*</span></label>
                                         <input type="text" th:field="*{DPICliente}" class="form-control"
-                                               placeholder="Ingrese el número de DPI" required
-                                               th:readonly="${cliente.DPICliente != null}">
+                                               placeholder="13 dígitos sin espacios"
+                                               th:readonly="${cliente.DPICliente != null}"
+                                               th:classappend="${#fields.hasErrors('DPICliente')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('DPICliente')}" class="invalid-feedback" th:errors="*{DPICliente}"></div>
+                                        <div class="form-text" th:unless="${cliente.DPICliente != null}">El DPI no se puede modificar después de crear el cliente.</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Estado</label>
+                                        <select th:field="*{estado}" class="form-select">
+                                            <option th:value="1">Activo</option>
+                                            <option th:value="0">Inactivo</option>
+                                        </select>
                                     </div>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-secondary">Nombre</label>
-                                    <input type="text" th:field="*{nombreCliente}" class="form-control"
-                                           placeholder="Ej: Juan" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-secondary">Apellido</label>
-                                    <input type="text" th:field="*{apellidoCliente}" class="form-control"
-                                           placeholder="Ej: Pérez" required>
-                                </div>
-
-                                <div class="col-md-8">
-                                    <label class="form-label fw-bold text-secondary">Dirección de Residencia</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
-                                        <input type="text" th:field="*{direccion}" class="form-control"
-                                               placeholder="Avenida, Calle, Ciudad..." required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold text-secondary">Estado del Cliente</label>
-                                    <select th:field="*{estado}" class="form-select">
-                                        <option th:value="1">🟢 Activo</option>
-                                        <option th:value="0">🔴 Inactivo</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <hr class="my-4 text-muted">
+                            </fieldset>
 
                             <div class="d-flex justify-content-end gap-2">
-                                <a th:href="@{/clientes}" class="btn btn-outline-secondary px-4">
-                                    <i class="bi bi-x-circle me-1"></i> Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-primary px-5 shadow-sm">
-                                    <i class="bi bi-save me-1"></i> Guardar Cliente
-                                </button>
+                                <a th:href="@{/clientes}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
                             </div>
                         </form>
                     </div>
