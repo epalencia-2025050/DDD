@@ -13,4 +13,5 @@ public interface IProductoService {
     Producto ActualizarP(Long code, Producto producto);
     void eliminarP(Long code);
     boolean existCode(Long code);
+    Producto actualizar(Producto producto);
 }

@@ -41,8 +41,12 @@ public class VentaService implements IVentaService{
     }
 
     @Override
+    public Venta actualizar(Venta venta) {
+        return ventaRepository.save(venta);
+    }
+
+    @Override
     public Venta guardar(Venta venta) {
-        // Validar que el cliente y usuario no sean nulos
         if (venta.getCliente() == null || venta.getCliente().getDPICliente() == null) {
             throw new IllegalArgumentException("Debe proporcionar un cliente con DPI válido");
         }

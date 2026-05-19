@@ -43,18 +43,23 @@ public class usuarioService implements IUsuarioService {
 
     @Override
     public Usuario ActualizarU(Long code, Usuario usuario) {
-        if (!usuarioRepository.existsById(code)) {
-            throw new RuntimeException("Usuario no se encuentra con el codigoUsuario " + code);
+        Usuario existing = usuarioRepository.findById(code)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        existing.setUsername(usuario.getUsername());
+        existing.setEmail(usuario.getEmail());
+        existing.setRol(usuario.getRol());
+        existing.setEstado(usuario.getEstado());
+
+        if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
+            if (!usuario.getPassword().startsWith("$2a$")) {
+                existing.setPassword(passwordEncoder.encode(usuario.getPassword()));
+            } else {
+                existing.setPassword(usuario.getPassword());
+            }
         }
-        Usuario existing = usuarioRepository.findById(code).get();
-        if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
-            usuario.setPassword(existing.getPassword());
-        } else if (!usuario.getPassword().startsWith("$2a$")) {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        }
-        usuario.setCodigoUsuario(code);
-        validarUsuario(usuario);
-        return usuarioRepository.save(usuario);
+
+        return usuarioRepository.save(existing);
     }
 
     @Override
@@ -84,8 +89,13 @@ public class usuarioService implements IUsuarioService {
     }
 
     @Override
-    public Optional<Usuario> buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+    public boolean existeEmail(String email) {
+        return usuarioRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public boolean existeUsername(String username) {
+        return usuarioRepository.findByUsername(username).isPresent();
     }
 
     private void validarUsuario(Usuario usuario) {

@@ -20,13 +20,18 @@ public class DetalleVentaService implements IDetalleVentaService {
     private final DetalleVentaRepository detalleVentaRepository;
     private final VentaRepository ventaRepository;
     private final ProductoRepository productoRepository;
+    private final IVentaService ventaService;
+    private final IProductoService productoService;
+
 
     public DetalleVentaService(DetalleVentaRepository detalleVentaRepository,
                                VentaRepository ventaRepository,
-                               ProductoRepository productoRepository) {
+                               ProductoRepository productoRepository, IVentaService ventaService, IProductoService productoService) {
         this.detalleVentaRepository = detalleVentaRepository;
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
+        this.ventaService = ventaService;
+        this.productoService = productoService;
     }
 
     @Override
@@ -36,21 +41,54 @@ public class DetalleVentaService implements IDetalleVentaService {
     }
 
     @Override
-    public DetalleVenta guardar(DetalleVenta detalleVenta) {
-        validarDetalleVenta(detalleVenta);
-        Venta venta = ventaRepository.findById(detalleVenta.getVenta().getCodigoVenta())
-                .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + detalleVenta.getVenta().getCodigoVenta()));
-        Producto producto = productoRepository.findById(detalleVenta.getProducto().getCodigoProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + detalleVenta.getProducto().getCodigoProducto()));
+    @Transactional
+    public DetalleVenta guardar(DetalleVenta detalle) {
+        // Validaciones
+        if (detalle.getVenta() == null) {
+            throw new IllegalArgumentException("Debe seleccionar una venta");
+        }
+        if (detalle.getProducto() == null) {
+            throw new IllegalArgumentException("Debe seleccionar un producto");
+        }
+        if (detalle.getCantidad() <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a cero");
+        }
+        if (detalle.getPrecioUnitario() == null || detalle.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
+        }
 
-        detalleVenta.setVenta(venta);
-        detalleVenta.setProducto(producto);
-        calcularSubtotal(detalleVenta);
+        // 1. Decrementar stock
+        Producto producto = detalle.getProducto();
+        if (producto.getStock() < detalle.getCantidad()) {
+            throw new IllegalArgumentException("Stock insuficiente. Stock actual: " + producto.getStock());
+        }
+        producto.setStock(producto.getStock() - detalle.getCantidad());
+        productoService.actualizar(producto);  // Asegúrate de tener inyectado IProductoService
 
-        DetalleVenta saved = detalleVentaRepository.save(detalleVenta);
-        actualizarTotalVenta(saved.getVenta());
+        // 2. Calcular subtotal (si no viene ya calculado)
+        if (detalle.getSubtotal() == null || detalle.getSubtotal().compareTo(BigDecimal.ZERO) == 0) {
+            BigDecimal subtotal = BigDecimal.valueOf(detalle.getCantidad())
+                    .multiply(detalle.getPrecioUnitario());
+            detalle.setSubtotal(subtotal);
+        }
 
-        return saved;
+        // 3. Guardar el detalle
+        DetalleVenta detalleGuardado = detalleVentaRepository.save(detalle);
+
+        // 4. Recalcular y actualizar el total de la venta
+        Venta venta = detalle.getVenta();
+        BigDecimal nuevoTotal = calcularTotalVenta(venta.getCodigoVenta());
+        venta.setTotal(nuevoTotal);
+        ventaService.actualizar(venta);
+
+        return detalleGuardado;
+    }
+
+    private BigDecimal calcularTotalVenta(Long codigoVenta) {
+        List<DetalleVenta> detalles = detalleVentaRepository.findByVenta_CodigoVenta(codigoVenta);
+        return detalles.stream()
+                .map(DetalleVenta::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
@@ -96,11 +134,9 @@ public class DetalleVentaService implements IDetalleVentaService {
     }
 
     private void actualizarTotalVenta(Venta venta) {
-        // Recargar la venta desde la base de datos para tener los detalles actualizados
         Venta managedVenta = ventaRepository.findById(venta.getCodigoVenta())
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + venta.getCodigoVenta()));
 
-        // Sumar los subtotales de los detalles
         BigDecimal total = managedVenta.getDetalles().stream()
                 .map(DetalleVenta::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -120,6 +156,5 @@ public class DetalleVentaService implements IDetalleVentaService {
                 detalleVenta.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio unitario debe ser mayor a cero");
         }
-        // No validamos subtotal porque se calcula automáticamente
     }
 }
