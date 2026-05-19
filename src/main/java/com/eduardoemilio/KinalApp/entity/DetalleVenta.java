@@ -2,6 +2,10 @@ package com.eduardoemilio.KinalApp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -12,10 +16,20 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_detalle_venta")
     private Long codigoDetalleVenta;
+
+    @NotNull(message = "La cantidad es obligatoria")
+    @Positive(message = "La cantidad debe ser mayor a 0")
     @Column(nullable = false)
     private int cantidad;
+
+    @NotNull(message = "El precio unitario es obligatorio")
+    @Positive(message = "El precio unitario debe ser mayor a 0")
+    @DecimalMin(value = "0.01", message = "El precio mínimo es 0.01")
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precioUnitario;
+
+    @NotNull(message = "El subtotal es obligatorio")
+    @DecimalMin(value = "0.00", message = "El subtotal no puede ser negativo")
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal subtotal;
 
@@ -24,10 +38,12 @@ public class DetalleVenta {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ventas_codigo_venta", referencedColumnName = "codigo_venta", nullable = false)
+    @NotNull(message = "Debe seleccionar un producto")
     private Venta venta;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto", nullable = false)
+    @NotNull(message = "Debe seleccionar una venta")
     private Producto producto;
 
     public DetalleVenta(Long codigoDetalleVenta, int cantidad, BigDecimal precioUnitario, BigDecimal subtotal, Venta venta, Producto producto) {
